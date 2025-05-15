@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { fetchConversations, fetchConversationHistory, sendMessage } from '../services/AgentService.js';
+import toast from 'react-hot-toast';
 
 const ChatContext = createContext(null);
 
@@ -30,12 +31,8 @@ export const ChatProvider = ({ children }) => {
         }
         setLoading(false);
       } catch (error) {
-        // toast({
-        //   title: "Error",
-        //   description: "Failed to load conversations",
-        //   variant: "destructive",
-        // });
         setLoading(false);
+        toast.error("Failed to load conversations");
       }
     };
 
@@ -62,11 +59,7 @@ export const ChatProvider = ({ children }) => {
 
       setLoading(false);
     } catch (error) {
-      // toast({
-      //   title: "Error",
-      //   description: "Failed to load chat history",
-      //   variant: "destructive",
-      // });
+      // toast.error("Failed to load chat history")
       setLoading(false);
     }
   };
@@ -87,11 +80,7 @@ export const ChatProvider = ({ children }) => {
       setLoading(false);
       return response;
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive",
-      });
+      toast.error("Failed to send Message")
       setLoading(false);
       throw error;
     }
@@ -116,20 +105,11 @@ export const ChatProvider = ({ children }) => {
 
       // Initialize empty chat history
       setChatHistory({ csp: currentCSP, history: [] });
-
-      toast({
-        title: "Success",
-        description: "New conversation created",
-      });
-
+      toast.success("New conversation created")
       setLoading(false);
       return newUserId;
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create new conversation",
-        variant: "destructive",
-      });
+      toast.error("Failed to create new Conversation")
       setLoading(false);
       throw error;
     }

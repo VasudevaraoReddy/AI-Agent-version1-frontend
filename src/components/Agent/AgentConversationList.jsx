@@ -8,7 +8,7 @@ const AgentConversationList = () => {
   return (
     <div className="p-4 border-r h-full overflow-y-auto">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Conversations</h2>
+        <h2 className="text-xl">Conversations</h2>
         <button
           onClick={createNewConversation}
           disabled={loading}
@@ -32,7 +32,7 @@ const AgentConversationList = () => {
             conversations.map((userId) => (
               <button
                 key={userId}
-                className={`w-full justify-start text-left px-3 py-2 rounded-md border ${currentUser === userId
+                className={`w-full cursor-pointer justify-start text-left px-3 py-2 rounded-md border ${currentUser === userId
                   ? 'bg-blue-500 text-white border-blue-500'
                   : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
                   }`}
