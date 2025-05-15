@@ -1,14 +1,16 @@
+import React, { useState } from 'react';
 import { ArrowUpRight, UserCircle, Bot } from "lucide-react";
 import { useChatContext } from '../../context/ChatContext.jsx';
 
 const AgentChatMessage = ({ message, isUser }) => {
     const { sendMessage, chatHistory } = useChatContext();
+    const [formData, setFormData] = useState({}); // Store form field values
 
     const wasMenuItemSelected = (menuItem) => {
         const messages = chatHistory.history || [];
         const currentMessageIndex = messages.findIndex(
-            msg => msg[0] === 'assistant' &&
-                (msg[1] === message ||
+            msg => msg?.role === 'assistant' &&
+                (msg?.content === message ||
                     (typeof msg[1] === 'object' && msg[1].response === message.response))
         );
 
@@ -17,11 +19,19 @@ const AgentChatMessage = ({ message, isUser }) => {
         }
 
         const nextMessage = messages[currentMessageIndex + 1];
-        return nextMessage && nextMessage[0] === 'human' && nextMessage[1] === menuItem;
+        return nextMessage && nextMessage?.role === 'human' && nextMessage?.content === menuItem;
     };
 
     const handleMenuItemClick = (option) => {
         sendMessage(option);
+    };
+
+    const handleInputChange = (fieldId, value) => {
+        setFormData((prev) => ({ ...prev, [fieldId]: value }));
+    };
+
+    const handleSubmit = () => {
+        console.log(formData)
     };
 
     const renderMenu = (menuItems) => {
@@ -37,9 +47,10 @@ const AgentChatMessage = ({ message, isUser }) => {
                             <button
                                 key={index}
                                 onClick={() => handleMenuItemClick(item)}
+                                disabled={isSelected}
                                 className={`flex cursor-pointer items-center text-left px-3 py-2 rounded-md text-sm transition-colors border 
                                     ${isSelected
-                                        ? 'bg-gray-200 text-gray-700 border-gray-300'
+                                        ? 'bg-gray-200 text-gray-700 border-gray-300 disabled:cursor-not-allowed'
                                         : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200'
                                     }`}
                             >
@@ -65,10 +76,18 @@ const AgentChatMessage = ({ message, isUser }) => {
                         <input
                             type="text"
                             placeholder={field.fieldName}
+                            value={formData[field.fieldId] || ''}
+                            onChange={(e) => handleInputChange(field.fieldId, e.target.value)}
                             className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
                         />
                     </div>
                 ))}
+                <button
+                    onClick={handleSubmit}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition-colors"
+                >
+                    Submit
+                </button>
             </div>
         );
     };
@@ -103,10 +122,8 @@ const AgentChatMessage = ({ message, isUser }) => {
 
     return (
         <div className={`flex items-start gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
-            {/* Agent Icon on the left */}
             {!isUser && <Bot className="w-6 h-6 mt-1 text-gray-400" />}
 
-            {/* Message bubble */}
             <div
                 className={`p-4 max-w-[80%] rounded-lg shadow-sm ${isUser
                     ? 'bg-blue-600 text-white ml-auto'
@@ -116,12 +133,9 @@ const AgentChatMessage = ({ message, isUser }) => {
                 {isUser ? <p>{message}</p> : renderComplexMessage(message)}
             </div>
 
-            {/* User icon on the right */}
             {isUser && <UserCircle className="w-6 h-6 mt-1 text-blue-300" />}
         </div>
     );
-
 };
 
 export default AgentChatMessage;
-

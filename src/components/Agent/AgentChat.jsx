@@ -151,8 +151,8 @@ const AgentChat = () => {
         ) : (
           <>
             {messages.map((msg, index) => {
-              const isUser = msg[0] === "human";
-              const content = msg[1];
+              const isUser = msg.role === "human";
+              const content = msg.content;
               return (
                 <AgentChatMessage
                   key={index}
