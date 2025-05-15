@@ -1,0 +1,39 @@
+.linear-bg1 {
+  background: #964ad9;
+  background: linear-gradient(90deg, rgba(150, 74, 217, 1) 0%, rgba(83, 237, 178, 1) 50%, rgba(6, 93, 140, 1) 100%);
+}
+
+.text-gradient {
+  background: #FFE600;
+background: linear-gradient(164deg,rgba(255, 230, 0, 1) 0%, rgba(46, 46, 56, 1) 39%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Optional for Safari */
+  background-clip: text;
+  color: transparent;
+}
+
+
+.main-bg {
+  /* background: linear-gradient(rgb(230, 242, 255), rgb(248, 249, 250)); */
+  background-color: #cccccc;
+  height: 100%;
+  width: 100%;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
