@@ -1,13 +1,17 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { fetchConversations, fetchConversationHistory, sendMessage } from '../services/AgentService.js';
-import toast from 'react-hot-toast';
+import { createContext, useContext, useState, useEffect } from "react";
+import {
+  fetchConversations,
+  fetchConversationHistory,
+  sendMessage,
+} from "../services/AgentService.js";
+import toast from "react-hot-toast";
 
 const ChatContext = createContext(null);
 
 export const useChatContext = () => {
   const context = useContext(ChatContext);
   if (!context) {
-    throw new Error('useChatContext must be used within a ChatProvider');
+    throw new Error("useChatContext must be used within a ChatProvider");
   }
   return context;
 };
@@ -65,24 +69,52 @@ export const ChatProvider = ({ children }) => {
   };
 
   const handleSendMessage = async (message) => {
-    try {
-      setLoading(true);
+    console.log(message, typeof message)
+    if (typeof message === "string") {
+      try {
+        setLoading(true);
 
-      if (!currentUser) {
-        throw new Error("No user selected");
+        if (!currentUser) {
+          throw new Error("No user selected");
+        }
+
+        const response = await sendMessage(message, currentUser, currentCSP);
+
+        // Update chat history after sending message
+        await loadChatHistory(currentUser);
+
+        setLoading(false);
+        return response;
+      } catch (error) {
+        toast.error("Failed to send Message");
+        setLoading(false);
+        throw error;
       }
+    } else {
+      try {
+        setLoading(true);
 
-      const response = await sendMessage(message, currentUser, currentCSP);
+        if (!currentUser) {
+          throw new Error("No user selected");
+        }
 
-      // Update chat history after sending message
-      await loadChatHistory(currentUser);
+        const response = await sendMessage(
+          message?.message,
+          currentUser,
+          currentCSP,
+          message?.fields
+        );
 
-      setLoading(false);
-      return response;
-    } catch (error) {
-      toast.error("Failed to send Message")
-      setLoading(false);
-      throw error;
+        // Update chat history after sending message
+        await loadChatHistory(currentUser);
+
+        setLoading(false);
+        return response;
+      } catch (error) {
+        toast.error("Failed to send Message");
+        setLoading(false);
+        throw error;
+      }
     }
   };
 
@@ -98,18 +130,18 @@ export const ChatProvider = ({ children }) => {
       const newUserId = `user${Date.now()}`;
 
       // Add new user ID to conversations list
-      setConversations(prev => [...prev, newUserId]);
+      setConversations((prev) => [...prev, newUserId]);
 
       // Switch to the new user
       setCurrentUser(newUserId);
 
       // Initialize empty chat history
       setChatHistory({ csp: currentCSP, history: [] });
-      toast.success("New conversation created")
+      toast.success("New conversation created");
       setLoading(false);
       return newUserId;
     } catch (error) {
-      toast.error("Failed to create new Conversation")
+      toast.error("Failed to create new Conversation");
       setLoading(false);
       throw error;
     }
@@ -125,7 +157,7 @@ export const ChatProvider = ({ children }) => {
     sendMessage: handleSendMessage,
     switchUser,
     refreshHistory: () => loadChatHistory(currentUser),
-    createNewConversation
+    createNewConversation,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

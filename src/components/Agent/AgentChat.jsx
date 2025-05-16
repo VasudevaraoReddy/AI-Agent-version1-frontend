@@ -5,8 +5,14 @@ import AgentChatMessage from "./AgentChatMessage.jsx";
 import AgentChatInput from "./AgentChatInput.jsx";
 
 const AgentChat = () => {
-  const { chatHistory, currentUser, currentCSP, loading, setCurrentCSP } =
-    useChatContext();
+  const {
+    chatHistory,
+    currentUser,
+    currentCSP,
+    loading,
+    setCurrentCSP,
+    sendMessage,
+  } = useChatContext();
   const messagesEndRef = useRef(null);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -95,16 +101,29 @@ const AgentChat = () => {
         ) : messages.length === 0 ? (
           <div>
             <p className="text-center text-gray-400 py-8 text-sm">
-               No messages yet
-               <br/>
-               <br/>
-              You have selected <span className="font-bold uppercase">{currentCSP}</span>.
+              No messages yet
+              <br />
+              <br />
+              You have selected{" "}
+              <span className="font-bold uppercase">{currentCSP}</span>.
               <a
                 onClick={() => setShowDialog(true)}
                 className="m-1 p-2 underline text-black cursor-pointer"
               >
                 Change CSP
               </a>
+              <br />
+              <br />
+              <button
+                className="bg-transparent border p-2 rounded-md cursor-pointer"
+                onClick={() =>
+                  sendMessage(
+                    `I Prefer to go with ${currentCSP.toUpperCase()} as CSP`
+                  )
+                }
+              >
+                Start Conversation
+              </button>
             </p>
             {/* Dialog */}
             {showDialog && (
@@ -167,9 +186,11 @@ const AgentChat = () => {
       </div>
 
       {/* Chat Input */}
-      <div className="border-t border-gray-200 bg-white p-4 rounded-b-lg">
-        <AgentChatInput />
-      </div>
+      {messages?.length > 0 && (
+        <div className="border-t border-gray-200 bg-white p-4 rounded-b-lg">
+          <AgentChatInput />
+        </div>
+      )}
     </div>
   );
 };

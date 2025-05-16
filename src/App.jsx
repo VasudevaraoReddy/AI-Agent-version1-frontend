@@ -4,6 +4,7 @@ import HomePage from './components/HomePage.jsx';
 import './App.css'
 import Vasu from './components/Vasu.jsx';
 import AgentHomePage from './components/Agent/AgentHomePage.jsx';
+import 'react-tooltip/dist/react-tooltip.css'
 
 const App = () => {
   return (

@@ -26,7 +26,7 @@ export const fetchConversationHistory = async (userId) => {
   }
 };
 
-export const sendMessage = async (message, userId, csp) => {
+export const sendMessage = async (message, userId, csp, fields) => {
   try {
     const response = await fetch(`${API_BASE_URL}/chat`, {
       method: "POST",
@@ -37,6 +37,7 @@ export const sendMessage = async (message, userId, csp) => {
         message,
         userId,
         csp,
+        ...(fields && { fields }),
       }),
     });
     
