@@ -97,38 +97,32 @@ const AgentChatMessage = ({ message, isUser }) => {
     );
   };
 
+  const [confirmedSuggested, setConfirmedSuggested] = useState(false);
+
   const renderRequiredFields = (name, template, fields) => {
-    if (!fields || !fields.length) return null;
+    if (!fields?.length) return null;
+
+    const handleSuggestedClick = () => {
+      const suggested = {};
+      fields.forEach((f) => {
+        suggested[f.fieldId] = f.exampleValue || "";
+      });
+      setFormData(suggested);
+      setConfirmedSuggested(true);
+    };
 
     return (
-      <div className="mt-3 space-y-3">
-        <p className="font-medium">Required Information:</p>
-        {/* {fields.map((field) => (
-          <div key={field.fieldId} className="flex flex-col">
-            <label className="text-sm mb-1">{field.fieldName}</label>
-            <input
-              type="text"
-              placeholder={field.fieldName}
-              value={formData[field.fieldId] || ""}
-              onChange={(e) => handleInputChange(field.fieldId, e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-          </div>
-        ))} */}
+      <div className="mt-4 space-y-4">
         {fields.map((field) => (
           <div key={field.fieldId} className="flex flex-col">
             <label className="text-sm mb-1 flex items-center gap-1">
               {field.fieldName}
-
-              {/* Tooltip trigger */}
               <span
                 id={`tooltip-trigger-${field.fieldId}`}
                 className="text-gray-400 cursor-pointer"
               >
-                <Info className="w-3 h-3 text-[#ccc]"/>
+                <Info className="w-3 h-3 text-[#ccc]" />
               </span>
-
-              {/* Tooltip content */}
               <Tooltip
                 anchorSelect={`#tooltip-trigger-${field.fieldId}`}
                 place="top"
@@ -139,28 +133,55 @@ const AgentChatMessage = ({ message, isUser }) => {
                 {field.explanation}
               </Tooltip>
             </label>
-
             <input
               type="text"
-              placeholder={field.exampleValue || field.fieldName}
               value={formData[field.fieldId] || ""}
+              placeholder={field.exampleValue}
               onChange={(e) => handleInputChange(field.fieldId, e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
           </div>
         ))}
 
+        {!confirmedSuggested && (
+          <div className="mt-2 flex flex-row">
+            <p className="text-sm text-gray-600 mr-2">
+              Do you want to use the suggested values?
+            </p>
+            <button
+              onClick={handleSuggestedClick}
+              className="border-1 text-black cursor-pointer pl-2 pr-2 w-[70px] rounded-md text-sm"
+            >
+              Yes
+            </button>
+          </div>
+        )}
+
         <button
           onClick={() => handleSubmit(name, template)}
-          disabled={isDeploymentNext()}
-          className={`${
-            isDeploymentNext()
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700"
-          } px-4 py-2 rounded-md text-sm transition-colors`}
+          disabled={!confirmedSuggested}
+          className={`mt-4 px-4 py-2 rounded-md text-sm transition-colors ${
+            confirmedSuggested
+              ? "bg-green-600 text-white hover:bg-green-700"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
         >
           Submit
         </button>
+      </div>
+    );
+  };
+
+  const renderConversationSummary = (questions) => {
+    return (
+      <div>
+        {questions?.map((eachQuestion, index) => {
+          return (
+            <p key={index}>
+              {index + 1}. {eachQuestion}
+            </p>
+          );
+        })}
       </div>
     );
   };
@@ -224,6 +245,10 @@ const AgentChatMessage = ({ message, isUser }) => {
               )}
             </div>
           )}
+
+          {workflow === "conversationSummary"
+            ? renderConversationSummary(response?.previousQuestions)
+            : ""}
 
           {response.menu && renderMenu(response.menu)}
         </div>
