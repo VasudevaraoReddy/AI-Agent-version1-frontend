@@ -133,13 +133,46 @@ const AgentChatMessage = ({ message, isUser }) => {
                 {field.explanation}
               </Tooltip>
             </label>
-            <input
-              type="text"
-              value={formData[field.fieldId] || ""}
-              placeholder={field.exampleValue}
-              onChange={(e) => handleInputChange(field.fieldId, e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
+            {field.fieldTypeValue === "List" ? (
+              <select
+                multiple={field.multiSelect}
+                value={formData[field.fieldId] || (field.multiSelect ? [] : "")}
+                onChange={(e) => {
+                  const value = field.multiSelect
+                    ? Array.from(
+                        e.target.selectedOptions,
+                        (option) => option.value
+                      )
+                    : e.target.value;
+                  handleInputChange(field.fieldId, value);
+                }}
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              >
+                {!field.multiSelect && (
+                  <option value="">Select an option</option>
+                )}
+                {(field.options?.length > 0
+                  ? field.options
+                  : Array.isArray(field.exampleValue)
+                  ? field.exampleValue
+                  : []
+                ).map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={formData[field.fieldId] || ""}
+                placeholder={field.exampleValue}
+                onChange={(e) =>
+                  handleInputChange(field.fieldId, e.target.value)
+                }
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              />
+            )}
           </div>
         ))}
 
